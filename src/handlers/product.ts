@@ -54,7 +54,7 @@ export const updateProduct = async (req, res) => {
     },
   });
 
-  res.json({ data: updated });
+  res.status(200).json({ data: updated });
 };
 
 // Delete one

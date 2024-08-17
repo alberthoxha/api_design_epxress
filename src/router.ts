@@ -5,6 +5,7 @@ import {
   deleteProduct,
   getOneProduct,
   getProducts,
+  updateProduct,
 } from "./handlers/product";
 import {
   createUpdate,
@@ -27,7 +28,7 @@ router.put(
   "/product/:id",
   body("name").isString(),
   handleInputErrors,
-  (req, res) => {}
+  updateProduct
 );
 router.post(
   "/product",
