@@ -6,15 +6,15 @@ import {
   getOneProduct,
   getProducts,
   updateProduct,
-} from "./handlers/product";
+} from "./controllers/product.controller";
 import {
   createUpdate,
   deleteUpdate,
   getOneUpdate,
   getUpdates,
   updateUpdate,
-} from "./handlers/update";
-import { handleInputErrors } from "./modules/middleware";
+} from "./controllers/update.controller";
+import { handleInputErrors } from "./middlewares/middleware";
 
 const router = Router();
 

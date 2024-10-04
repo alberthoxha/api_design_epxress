@@ -1,4 +1,4 @@
-import prisma from "../db";
+import prisma from "../prisma/client";
 
 // Get all
 export const getProducts = async (req, res) => {

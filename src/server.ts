@@ -1,29 +1,18 @@
 import cors from "cors";
 import express from "express";
 import morgan from "morgan";
-import { createNewUser, signin } from "./handlers/user";
-import { protect } from "./modules/auth";
+import {protect} from "./middlewares/auth";
 import router from "./router";
+import userRouter from "./routes/user.router";
 
 const app = express();
 
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.get("/", (req, res) => {
-  res.json({ message: "hello from the app" });
-});
+app.use(express.urlencoded({extended: true}));
 
 app.use("/api", protect, router);
-
-app.post("/user", createNewUser);
-app.post("/signin", signin);
-
-app.use((err, req, res, next) => {
-  console.log(err);
-  res.json({ message: `had an error: ${err.message}` });
-});
+app.use("/user", userRouter);
 
 export default app;
