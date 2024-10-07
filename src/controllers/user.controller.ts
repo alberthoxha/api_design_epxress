@@ -1,10 +1,11 @@
-import prisma from "../prisma/client";
 import { comparePasswords, createJWT, hashPassword } from "../middlewares/auth";
+import prisma from "../prisma/client";
 
 export const createNewUser = async (req, res) => {
   const user = await prisma.user.create({
     data: {
-      username: req.body.username,
+      name: req.body.name,
+      email: req.body.email,
       password: await hashPassword(req.body.password),
     },
   });
@@ -13,10 +14,10 @@ export const createNewUser = async (req, res) => {
   res.json({ token });
 };
 
-export const signin = async (req, res) => {
+export const login = async (req, res) => {
   const user = await prisma.user.findUnique({
     where: {
-      username: req.body.username,
+      email: req.body.email,
     },
   });
 

@@ -11,55 +11,71 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  createdAt DateTime  @default(now())
-  username  String    @unique
-  password  String
-  products  Product[]
+  id          String        @id @default(uuid())
+  name        String
+  email       String        @unique
+  password    String
+  transactions Transaction[]
+  categories  Category[]
+  budgets     Budget[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
-model Product {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
+model Category {
+  id          String        @id @default(uuid())
+  name        String
+  type        CategoryType
+  user        User          @relation(fields: [userId], references: [id])
+  userId      String
+  transactions Transaction[]
+  budgets     Budget[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
-  name        String   @db.VarChar(255)
-  belongsToId String
-  belongsTo   User     @relation(fields: [belongsToId], references: [id])
-  updates     Update[]
-
-  @@unique([id, belongsToId])
+  @@index([userId])
 }
 
-enum UPDATE_STATUS {
-  IN_PROGRESS
-  SHIPPED
-  DEPRECATED
+model Transaction {
+  id          String      @id @default(uuid())
+  amount      Float
+  type        TransactionType
+  description String?
+  date        DateTime
+  category    Category    @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  user        User        @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([categoryId])
 }
 
-model Update {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Budget {
+  id         String      @id @default(uuid())
+  amount     Float
+  month      Int         // 1-12
+  year       Int
+  category   Category    @relation(fields: [categoryId], references: [id])
+  categoryId String
+  user       User        @relation(fields: [userId], references: [id])
+  userId     String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 
-  title   String
-  body    String
-  status  UPDATE_STATUS @default(IN_PROGRESS)
-  version String?
-  asset   String?
-
-  productId    String
-  product      Product       @relation(fields: [productId], references: [id])
-  updatePoints UpdatePoint[]
+  @@unique([userId, categoryId, month, year])
+  @@index([userId])
+  @@index([categoryId])
 }
 
-model UpdatePoint {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime
+enum CategoryType {
+  income
+  expense
+}
 
-  name        String @db.VarChar(255)
-  description String
-
-  updateId String
-  update   Update @relation(fields: [updateId], references: [id])
+enum TransactionType {
+  income
+  expense
 }
