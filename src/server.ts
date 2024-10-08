@@ -1,13 +1,13 @@
 import cors from "cors";
-import express  from "express";
-import { Express } from 'express';
+import express, { Express, response } from 'express';
 import morgan from "morgan";
+import swaggerUi from 'swagger-ui-express';
 import { protect } from "./middlewares/auth";
 import userRouter from "./routes/user";
-import swaggerJSDoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './swagger';
 
 import router from "./router";
+import prisma from "./prisma/client";
 
 const app = express();
 app.use(cors());
@@ -15,35 +15,16 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Swagger configuration
-const options = {
-  swaggerDefinition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'My Express API',
-      version: '1.0.0',
-      description: 'API documentation for my Express app',
-    },
-    servers: [
-      {
-        url: 'http://localhost:3001', // Update with your server URL
-      },
-    ],
-  },
-  apis: ['./src/routes/*.ts'], // Path to your API docs (update as needed)
-};
-
-const swaggerSpec = swaggerJSDoc(options);
-
 export const setupSwagger = (app: Express) => {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 };
 
-app.get("/", (req, res) => {
-  res.send("<h1>Welcome to the server homepage</h1>");
+app.get("/", async (req, res) => {
+  const user = await prisma.user.findMany()
+  res.json(user)
 });
 
 app.use("/api", protect, router);
-app.use("api/user", userRouter);
+app.use("/user", userRouter);
 
 export default app;
