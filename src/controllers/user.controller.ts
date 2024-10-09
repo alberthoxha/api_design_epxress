@@ -1,34 +1,20 @@
-import { comparePasswords, createJWT, hashPassword } from "../middlewares/auth";
-import prisma from "../prisma/client";
+import { Request, Response } from "express";
+import { userService } from "../services/UserService";
 
-export const createNewUser = async (req, res) => {
-  const user = await prisma.user.create({
-    data: {
-      name: req.body.name,
-      email: req.body.email,
-      password: await hashPassword(req.body.password),
-    },
-  });
-
-  const token = createJWT(user);
-  res.json({ token });
+export const createNewUser = async (req: Request, res: Response) => {
+  try {
+    const { token } = await userService.createNewUser(req.body);
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 export const login = async (req, res) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      email: req.body.email,
-    },
-  });
-
-  const isValid = await comparePasswords(req.body.password, user.password);
-
-  if (!isValid) {
-    res.status(401);
-    res.json({ message: "nope" });
-    return;
+  try {
+    const { token } = await userService.login(req.body);
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-
-  const token = createJWT(user);
-  res.json({ token });
 };
