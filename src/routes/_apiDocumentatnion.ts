@@ -4,7 +4,7 @@
  *   - name: Account
  *     description: User account operations
  *
- * /user/signup:
+ * /api/user/signup:
  *   post:
  *     tags: [Account]
  *     summary: Create new user
@@ -31,7 +31,7 @@
  *       200:
  *         description: User created successfully
  * 
- * /user/login:
+ * /api/user/login:
  *   post:
  *     tags: [Account]
  *     summary: User login

@@ -2,13 +2,13 @@ import cors from "cors";
 import express, { Express, Request, Response } from "express";
 import morgan from "morgan";
 import swaggerUi from "swagger-ui-express";
-import { protect } from "./middlewares/auth";
+import { authenticate } from "./middlewares/auth";
 import userRouter from "./routes/user";
-import { swaggerSpec } from "./swagger";
+import { swaggerSpec } from "./swagger/swagger";
 
-import { type User } from "@prisma/client";
 import prisma from "./prisma/client";
 import router from "./router";
+import expensesRouter from "./routes/expenses";
 
 const app = express();
 app.use(cors());
@@ -19,7 +19,6 @@ app.use(express.urlencoded({ extended: true }));
 export const setupSwagger = (app: Express) => {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 };
-
 app.get("/", async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await prisma.user.findMany();
@@ -28,12 +27,10 @@ app.get("/", async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ error: "Failed to fetch users" });
   }
 });
-
+ 
 app.use("/api", userRouter);
-app.use("/api", protect, router);
+app.use("/api",authenticate, expensesRouter);
+app.use("/api", authenticate, router);
 
-app.use("/*", (_, res) => {
-  res.status(404).json({ message: "Not found" });
-});
 
 export default app;

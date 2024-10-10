@@ -11,71 +11,38 @@ datasource db {
 }
 
 model User {
-  id          String        @id @default(uuid())
-  name        String
-  email       String        @unique
+  id          Int        @id @default(autoincrement())
+  email       String     @unique
   password    String
-  transactions Transaction[]
-  categories  Category[]
-  budgets     Budget[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  name        String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  expenses    Expense[]
+}
+
+model Expense {
+  id          Int        @id @default(autoincrement())
+  amount      Float
+  description String?
+  date        DateTime   @default(now())
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id])
+  categoryId  Int?
+  category    Category?  @relation(fields: [categoryId], references: [id])
+  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  paymentMethodId Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 model Category {
-  id          String        @id @default(uuid())
-  name        String
-  type        CategoryType
-  user        User          @relation(fields: [userId], references: [id])
-  userId      String
-  transactions Transaction[]
-  budgets     Budget[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  @@index([userId])
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  expenses    Expense[]
 }
 
-model Transaction {
-  id          String      @id @default(uuid())
-  amount      Float
-  type        TransactionType
-  description String?
-  date        DateTime
-  category    Category    @relation(fields: [categoryId], references: [id])
-  categoryId  String
-  user        User        @relation(fields: [userId], references: [id])
-  userId      String
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-
-  @@index([userId])
-  @@index([categoryId])
-}
-
-model Budget {
-  id         String      @id @default(uuid())
-  amount     Float
-  month      Int         // 1-12
-  year       Int
-  category   Category    @relation(fields: [categoryId], references: [id])
-  categoryId String
-  user       User        @relation(fields: [userId], references: [id])
-  userId     String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-
-  @@unique([userId, categoryId, month, year])
-  @@index([userId])
-  @@index([categoryId])
-}
-
-enum CategoryType {
-  income
-  expense
-}
-
-enum TransactionType {
-  income
-  expense
+model PaymentMethod {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  expenses    Expense[]
 }
