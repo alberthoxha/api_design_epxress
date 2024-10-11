@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,39 +7,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum PaymentType {
+  CARD
+  CASH
+}
+
 model User {
-  id          Int        @id @default(autoincrement())
-  email       String     @unique
-  password    String
-  name        String
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  expenses    Expense[]
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  expenses  Expense[]
 }
 
 model Expense {
-  id          Int        @id @default(autoincrement())
-  amount      Float
-  description String?
-  date        DateTime   @default(now())
-  userId      Int
-  user        User       @relation(fields: [userId], references: [id])
-  categoryId  Int?
-  category    Category?  @relation(fields: [categoryId], references: [id])
-  paymentMethod PaymentMethod @relation(fields: [paymentMethodId], references: [id])
-  paymentMethodId Int
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id            String      @id @default(uuid())
+  amount        Float
+  description   String?
+  date          DateTime    @default(now())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  categoryId    String?
+  category      Category?   @relation(fields: [categoryId], references: [id])
+  paymentMethod PaymentType
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model Category {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  expenses    Expense[]
-}
-
-model PaymentMethod {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  expenses    Expense[]
+  id       String    @id @default(uuid())
+  name     String    @unique
+  expenses Expense[]
 }

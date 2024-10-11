@@ -1,26 +1,31 @@
-import prisma from "../prisma/client";
+import { PrismaClient } from "@prisma/client";
 import {
   comparePasswords,
   createJWT,
   hashPassword,
 } from "./../middlewares/auth";
+import { randomUUID } from "crypto";
+import { z } from "zod";
+import { CreateUserSchema } from "../zodSchema";
 
 class UserService {
-  async createNewUser(userData) {
-    const user = await prisma.user.create({
+  private prisma = new PrismaClient();
+
+  async createNewUser(userData: z.infer<typeof CreateUserSchema>) {
+    const user = await this.prisma.user.create({
       data: {
         name: userData.name,
         email: userData.email,
-        password: await hashPassword(userData.hashPassword),
+        password: await hashPassword(userData.password),  // Corrected property name
       },
     });
-
+  
     const token = createJWT(user);
     return { token };
   }
 
   async login(userData) {
-    const user = await prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         email: userData.email,
       },
@@ -40,4 +45,4 @@ class UserService {
   }
 }
 
-export const userService = new UserService();
+export default new UserService();

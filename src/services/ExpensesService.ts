@@ -1,33 +1,95 @@
+import { body } from "express-validator";
+import { Expense, PrismaClient } from "@prisma/client";
 import prisma from "../prisma/client";
+import { z } from "zod";
+import { CreateExpanseSchema } from "../zodSchema";
 
 class ExpensesService {
+  private prisma = new PrismaClient();
+
   async getServices(data) {
-    const { user } = data;
+    try {
+      const { user } = data;
 
-    const expenses = await prisma.expense.findMany({
-      where: {
-        userId: user.id,
-      },
-      include: {
-        category: true,
-        paymentMethod: true,
+      const expenses = await this.prisma.expense.findMany({
+        where: { userId: user.id },
+        include: { category: true },
+      });
+
+      const total = await prisma.expense.count({
+        where: { userId: user.id },
+      });
+
+      const formattedExpenses = expenses.map((expense) => ({
+        ...expense,
+        category: expense.category?.name,
+        paymentMethod: expense.paymentMethod,
+      }));
+
+      return { expenses: formattedExpenses, total };
+    } catch (error) {
+      this.logError(error);
+      throw error;
+    }
+  }
+
+  async getExpenseById(id: string) {
+    try {
+      const foundExpense = await this.prisma.expense.findUnique({
+        where: { id },
+        include: { category: true },
+      });
+
+      const formattedExpense = {
+        ...foundExpense,
+        category: foundExpense.category?.name,
+        paymentMethod: foundExpense.paymentMethod,
+      };
+
+      return formattedExpense;
+    } catch (error) {
+      this.logError(error);
+      throw error;
+    }
+  }
+
+  async createExpense(expenseData: z.infer<typeof CreateExpanseSchema>, req: any) {
+    const { amount, description, category, paymentMethod } = expenseData;
+    const userId = req.user.id;
+
+    const categoryId = category
+      ? (
+          await this.prisma.category.upsert({
+            where: { name: category },
+            update: {},
+            create: { name: category },
+          })
+        ).id
+      : null;
+
+    return await this.prisma.expense.create({
+      data: {
+        amount,
+        description,
+        userId,
+        categoryId,
+        paymentMethod,
       },
     });
+  }
 
-    const expensesCount = await prisma.expense.count({
-      where: {
-        userId: user.id,
-      },
-    });
+  async updateExpense(expenseId, expenseData) {
+    // Functionality to update an expense will be implemented here
+  }
 
-    const formattedExpenses = expenses.map((expense) => ({
-      ...expense,
-      category: expense.category?.name,
-      paymentMethod: expense.paymentMethod?.name,
-    }));
+  async deleteExpense(expenseId) {
+    // Functionality to delete an expense will be implemented here
+  }
 
-    return { expenses: formattedExpenses, total: expensesCount };
+  private logError(error: unknown) {
+    console.log("A prisma error orcurred");
+    console.log(error);
   }
 }
 
-export const expesesService = new ExpensesService();
+export default new ExpensesService();

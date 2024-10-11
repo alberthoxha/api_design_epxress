@@ -28,8 +28,8 @@ app.get("/", async (req: Request, res: Response): Promise<void> => {
   }
 });
  
-app.use("/api", userRouter);
-app.use("/api",authenticate, expensesRouter);
+app.use("/user", userRouter);
+app.use("/api/expenses",authenticate, expensesRouter);
 app.use("/api", authenticate, router);
 
 

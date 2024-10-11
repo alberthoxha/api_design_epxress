@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { Router } from "express";
-import { createNewUser, login } from "../controllers/user.controller"; // Import your getUsers controller
-import { getExpenses } from "../controllers/expensesController";
+import expensesController from "../controllers/expensesController";
 
 const expensesRouter = Router();
 
@@ -21,10 +19,8 @@ const expensesRouter = Router();
  *               items:
  *                 $ref: '#/components/PrismaClient'
  */
-expensesRouter.get("/expenses", getExpenses);          // Get all categories for the current user
-// expensesRoute.post("/categories", createCategory);        // Create a new category
-// expensesRoute.put("/categories/:id", updateCategory);     // Update a category by ID
-// expensesRoute.delete("/categories/:id", deleteCategory);
+expensesRouter.get("/", expensesController.getExpenses);
+expensesRouter.get("/:id", expensesController.getExpeseById); 
+expensesRouter.post("/", expensesController.createExpense);     
 
 export default expensesRouter;
-      

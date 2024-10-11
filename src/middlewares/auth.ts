@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-export const comparePasswords = (password, hash) => {
+export const comparePasswords = (password: string, hash: string): Promise<boolean> => {
   return bcrypt.compare(password, hash);
 };
 
@@ -20,19 +20,19 @@ export const createJWT = (user) => {
   return token;
 };
 
-export const authenticate  = (req, res, next) => {
+export const authenticate = (req, res, next) => {
   const bearer = req.headers.authorization;
   if (!bearer) {
     res.status(401);
     res.json({ message: "not authorized" });
     return;
   }
- 
+
   const [, token] = bearer.split(" ");
 
   if (!token) {
     res.status(401);
-    res.json({ message: "not valid token" }); 
+    res.json({ message: "not valid token" });
     return;
   }
 
