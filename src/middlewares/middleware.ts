@@ -1,8 +1,9 @@
+import { NextFunction, Response } from "express";
 import { validationResult } from "express-validator";
 
 
 
-export const handleInputErrors = (req, res, next) => {
+export const handleInputErrors = (req: Request, res: Response , next: NextFunction) => {
   const errors = validationResult(req)
 
   if (!errors.isEmpty()) {

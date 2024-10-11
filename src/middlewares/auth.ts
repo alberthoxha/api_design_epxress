@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import bcrypt from "bcrypt";
-import { NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 export const comparePasswords = (password: string, hash: string): Promise<boolean> => {
@@ -23,7 +23,6 @@ export const createJWT = (user: User) => {
 };
 
 
-
 export const authenticate = (req: any, res: any, next: NextFunction) => {
   const bearer = req.headers.authorization;
   if (!bearer) {
@@ -37,8 +36,7 @@ export const authenticate = (req: any, res: any, next: NextFunction) => {
   }
 
   try {
-    // Specify the type of user you expect from the token
-    const user = jwt.verify(token, process.env.JWT_SECRET!); // Use non-null assertion if you're sure it's defined
+    const user = jwt.verify(token, process.env.JWT_SECRET!);
     req.user = user; // Attach the user to the request
     next();
   } catch (e) {
