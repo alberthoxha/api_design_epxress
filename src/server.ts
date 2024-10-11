@@ -7,7 +7,6 @@ import userRouter from "./routes/user";
 import { swaggerSpec } from "./swagger/swagger";
 
 import prisma from "./prisma/client";
-import router from "./router";
 import expensesRouter from "./routes/expenses";
 
 const app = express();
@@ -30,7 +29,6 @@ app.get("/", async (req: Request, res: Response): Promise<void> => {
  
 app.use("/user", userRouter);
 app.use("/api/expenses",authenticate, expensesRouter);
-app.use("/api", authenticate, router);
 
 
 export default app;

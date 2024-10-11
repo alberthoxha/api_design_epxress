@@ -8,7 +8,7 @@ class ExpensesController {
     try {
       const { expenses, total } = await expensesService.getServices(req);
       res.json({ data: expenses, total });
-    } catch (error) {
+    } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   }
@@ -18,7 +18,7 @@ class ExpensesController {
       const { id } = req.params;
       const foundExpense = await expensesService.getExpenseById(id);
       res.status(200).json(foundExpense);
-    } catch (error) {
+    } catch (error: any) {
       res.status(500).send({ message: error?.message });
     }
   }
@@ -27,11 +27,14 @@ class ExpensesController {
     const expense = CreateExpanseSchema.strict().safeParse(req.body);
 
     if (!expense.success) res.status(400).json(expense.error);
-    
+
     try {
-      const newExpense = await expensesService.createExpense(expense.data, req);
+      const newExpense = await expensesService.createExpense(
+        expense.data!,
+        req
+      );
       res.status(201).json(newExpense);
-    } catch (error) {
+    } catch (error: any) {
       res.status(500).send({ message: error?.message });
     }
   }

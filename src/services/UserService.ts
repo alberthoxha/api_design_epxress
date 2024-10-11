@@ -6,7 +6,7 @@ import {
 } from "./../middlewares/auth";
 import { randomUUID } from "crypto";
 import { z } from "zod";
-import { CreateUserSchema } from "../zodSchema";
+import { CreateUserSchema, LoginUserSchema } from "../zodSchema";
 
 class UserService {
   private prisma = new PrismaClient();
@@ -24,7 +24,7 @@ class UserService {
     return { token };
   }
 
-  async login(userData) {
+  async login(userData: z.infer<typeof LoginUserSchema>) {
     const user = await this.prisma.user.findUnique({
       where: {
         email: userData.email,

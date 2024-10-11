@@ -1,13 +1,12 @@
-import { body } from "express-validator";
-import { Expense, PrismaClient } from "@prisma/client";
-import prisma from "../prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
+import prisma from "../prisma/client";
 import { CreateExpanseSchema } from "../zodSchema";
 
 class ExpensesService {
   private prisma = new PrismaClient();
 
-  async getServices(data) {
+  async getServices(data: any) {
     try {
       const { user } = data;
 
@@ -42,8 +41,8 @@ class ExpensesService {
 
       const formattedExpense = {
         ...foundExpense,
-        category: foundExpense.category?.name,
-        paymentMethod: foundExpense.paymentMethod,
+        category: foundExpense?.category?.name,
+        paymentMethod: foundExpense?.paymentMethod,
       };
 
       return formattedExpense;
@@ -53,7 +52,10 @@ class ExpensesService {
     }
   }
 
-  async createExpense(expenseData: z.infer<typeof CreateExpanseSchema>, req: any) {
+  async createExpense(
+    expenseData: z.infer<typeof CreateExpanseSchema>,
+    req: any
+  ) {
     const { amount, description, category, paymentMethod } = expenseData;
     const userId = req.user.id;
 
@@ -78,11 +80,11 @@ class ExpensesService {
     });
   }
 
-  async updateExpense(expenseId, expenseData) {
+  async updateExpense() {
     // Functionality to update an expense will be implemented here
   }
 
-  async deleteExpense(expenseId) {
+  async deleteExpense() {
     // Functionality to delete an expense will be implemented here
   }
 
