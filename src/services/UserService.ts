@@ -1,11 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 import { CreateUserSchema, LoginUserSchema } from '../zodSchema'
-import {
-  comparePasswords,
-  createJWT,
-  hashPassword,
-} from './../middlewares/auth'
+import { comparePasswords, createJWT, hashPassword } from './../middlewares/auth'
 
 class UserService {
   private prisma = new PrismaClient()

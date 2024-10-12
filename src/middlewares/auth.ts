@@ -3,10 +3,7 @@ import bcrypt from 'bcrypt'
 import { NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 
-export const comparePasswords = (
-  password: string,
-  hash: string,
-): Promise<boolean> => {
+export const comparePasswords = (password: string, hash: string): Promise<boolean> => {
   return bcrypt.compare(password, hash)
 }
 
@@ -27,7 +24,7 @@ export const createJWT = (user: User, expiresIn: string = '1h'): string => {
       email: user?.email,
     },
     secret,
-    { expiresIn },
+    { expiresIn }
   )
 
   return token

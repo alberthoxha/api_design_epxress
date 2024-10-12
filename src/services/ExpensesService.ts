@@ -39,8 +39,7 @@ class ExpensesService {
         include: { category: true },
       })
 
-      if (!foundExpense || foundExpense.userId !== req.user.id)
-        throw new Error('Expense not found')
+      if (!foundExpense || foundExpense.userId !== req.user.id) throw new Error('Expense not found')
 
       const formattedExpense = {
         ...foundExpense,
@@ -55,10 +54,7 @@ class ExpensesService {
     }
   }
 
-  async createExpense(
-    expenseData: z.infer<typeof CreateExpanseSchema>,
-    req: any,
-  ) {
+  async createExpense(expenseData: z.infer<typeof CreateExpanseSchema>, req: any) {
     const { amount, description, category, paymentMethod } = expenseData
     const userId = req.user.id
 
@@ -86,7 +82,7 @@ class ExpensesService {
   async updateExpenseById(
     expenseId: string,
     req: any,
-    updateValue: z.infer<typeof UpdateExpanseSchema>,
+    updateValue: z.infer<typeof UpdateExpanseSchema>
   ) {
     const { amount, category, description, paymentMethod } = updateValue
     const userId = req.user.id
@@ -97,8 +93,7 @@ class ExpensesService {
       },
     })
 
-    if (!existingExpense || existingExpense.userId !== userId)
-      throw new Error('Expense not found')
+    if (!existingExpense || existingExpense.userId !== userId) throw new Error('Expense not found')
 
     const categoryId = category
       ? (
