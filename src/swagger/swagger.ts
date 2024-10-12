@@ -10,11 +10,11 @@ const options = {
     },
     servers: [
       {
-        url: 'https://expandify.up.railway.app/', // Update with your server URL
+        url: 'https://expandify.up.railway.app/', 
       },
     ],
   },
-  apis: ['./src/routes/*.ts'], // Path to your API docs (update as needed)
+  apis: ['./src/routes/*.ts'],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

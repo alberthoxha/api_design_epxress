@@ -1,8 +1,6 @@
-import { User } from '@prisma/client';
 import { Request, Response } from "express";
-import userService from "../services/UserService"; // Ensure to import your userService
+import userService from "../services/UserService"; 
 import { CreateUserSchema, LoginUserSchema } from "../zodSchema";
-import { z } from "zod";
 
 class UserController {
   async createNewUser(req: Request, res: Response) {
@@ -25,10 +23,18 @@ class UserController {
 
     try {
       const { token } = await userService.login(req.body);
-      console.log(token);
       res.json({ token });
     } catch (error: any) {
       res.status(500).json({ error: error?.message });
+    }
+  }
+
+  async logout(req: Request, res: Response) {
+    try {
+      res.clearCookie("cookies");
+      res.status(200).json({ message: "Logged out successfully" });
+    } catch (error: any) {
+      res.status(500).json({ message: error?.message });
     }
   }
 }

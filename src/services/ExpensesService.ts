@@ -1,12 +1,15 @@
-import { PrismaClient } from "@prisma/client";
+import { UpdateExpanseSchema } from "./../zodSchema";
+import { Expense, PrismaClient } from "@prisma/client";
 import { z } from "zod";
 import prisma from "../prisma/client";
 import { CreateExpanseSchema } from "../zodSchema";
+import { Request } from "express";
+import exp from "constants";
 
 class ExpensesService {
   private prisma = new PrismaClient();
 
-  async getServices(data: any) {
+  async getAllExpenses(data: any) {
     try {
       const { user } = data;
 
@@ -32,12 +35,15 @@ class ExpensesService {
     }
   }
 
-  async getExpenseById(id: string) {
+  async getExpenseById(id: string, req: any) {
     try {
       const foundExpense = await this.prisma.expense.findUnique({
         where: { id },
         include: { category: true },
       });
+
+      if (!foundExpense || foundExpense.userId !== req.user.id)
+        throw new Error("Expense not found");
 
       const formattedExpense = {
         ...foundExpense,
@@ -80,12 +86,54 @@ class ExpensesService {
     });
   }
 
-  async updateExpense() {
-    // Functionality to update an expense will be implemented here
+  async updateExpenseById(
+    expenseId: string,
+    req: any,
+    updateValue: z.infer<typeof UpdateExpanseSchema>
+  ) {
+    const { amount, category, description, paymentMethod } = updateValue;
+    const userId = req.user.id;
+
+    const existingExpense = await this.prisma.expense.findUnique({
+      where: {
+        id: expenseId,
+      },
+    });
+
+    if (!existingExpense || existingExpense.userId !== userId)
+      throw new Error("Expense not found");
+
+    const categoryId = category
+      ? (
+          await this.prisma.category.upsert({
+            where: { name: category },
+            update: {},
+            create: { name: category },
+          })
+        ).id
+      : existingExpense.categoryId;
+
+    return await this.prisma.expense.update({
+      where: { id: expenseId },
+      data: { amount, description, categoryId, paymentMethod },
+    });
   }
 
-  async deleteExpense() {
-    // Functionality to delete an expense will be implemented here
+  async deleteExpenseById(expenseId: string, req: any) {
+    const expenseToDelete = await this.prisma.expense.findUnique({
+      where: {
+        id: expenseId,
+      },
+    });
+
+    if (!expenseToDelete || expenseToDelete.userId !== req.user.id)
+      throw new Error("Expense not found");
+
+    await this.prisma.expense.delete({
+      where: {
+        id: expenseId,
+      },
+    });
   }
 
   private logError(error: unknown) {

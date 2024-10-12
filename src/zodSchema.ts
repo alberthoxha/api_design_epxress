@@ -23,3 +23,11 @@ export const CreateExpanseSchema = z.object({
   category: z.string(),
   paymentMethod: z.nativeEnum(PaymentType),
 });
+
+
+export const UpdateExpanseSchema = z.object({
+  amount: z.number().multipleOf(0.01).min(1),
+  description: z.string().min(1),
+  category: z.string().min(1),
+  paymentMethod: z.nativeEnum(PaymentType),
+});
