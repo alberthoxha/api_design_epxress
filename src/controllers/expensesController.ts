@@ -7,8 +7,10 @@ class ExpensesController {
     try {
       const { expenses, total } = await expensesService.getAllExpenses(req);
       res.json({ data: expenses, total });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "An unexpected error occurred";
+      res.status(500).send({ message });
     }
   }
 
@@ -17,8 +19,10 @@ class ExpensesController {
       const { id } = req.params;
       const foundExpense = await expensesService.getExpenseById(id, req);
       res.status(200).json(foundExpense);
-    } catch (error: any) {
-      res.status(500).send({ message: error?.message });
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "An unexpected error occurred";
+      res.status(500).send({ message });
     }
   }
 

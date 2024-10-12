@@ -1,10 +1,7 @@
-import { UpdateExpanseSchema } from "./../zodSchema";
 import { Expense, PrismaClient } from "@prisma/client";
 import { z } from "zod";
-import prisma from "../prisma/client";
 import { CreateExpanseSchema } from "../zodSchema";
-import { Request } from "express";
-import exp from "constants";
+import { UpdateExpanseSchema } from "./../zodSchema";
 
 class ExpensesService {
   private prisma = new PrismaClient();
@@ -18,7 +15,7 @@ class ExpensesService {
         include: { category: true },
       });
 
-      const total = await prisma.expense.count({
+      const total = await this.prisma.expense.count({
         where: { userId: user.id },
       });
 

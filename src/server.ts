@@ -15,20 +15,20 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-export const setupSwagger = (app: Express) => {
+export const setupSwagger = (app: Express): void => {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 };
-app.get("/", async (req: Request, res: Response): Promise<void> => {
+
+app.get("/", async (_: Request, res: Response): Promise<void> => {
   try {
     const users = await prisma.user.findMany();
     res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch users" });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 });
- 
-app.use("/user", userRouter);
-app.use("/api/expenses",authenticate, expensesRouter);
 
+app.use("/user", userRouter);
+app.use("/api/expenses", authenticate, expensesRouter);
 
 export default app;
