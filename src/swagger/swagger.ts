@@ -1,4 +1,4 @@
-import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerJSDoc from 'swagger-jsdoc'
 
 const options = {
   swaggerDefinition: {
@@ -10,15 +10,13 @@ const options = {
     },
     servers: [
       {
-        url: 'https://expandify.up.railway.app/', 
+        url: 'https://expandify.up.railway.app/',
       },
     ],
   },
   apis: ['./src/routes/*.ts'],
-};
-
-const swaggerSpec = swaggerJSDoc(options);
-
-export {
-  swaggerSpec
 }
+
+const swaggerSpec = swaggerJSDoc(options)
+
+export { swaggerSpec }

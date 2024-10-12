@@ -1,6 +1,6 @@
 /**
  * @swagger
- * tags: 
+ * tags:
  *   - name: Account
  *     description: User account operations
  *
@@ -30,7 +30,7 @@
  *     responses:
  *       200:
  *         description: User created successfully
- * 
+ *
  * /api/user/login:
  *   post:
  *     tags: [Account]

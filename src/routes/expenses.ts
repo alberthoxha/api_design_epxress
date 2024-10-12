@@ -1,7 +1,7 @@
-import { Router } from "express";
-import expensesController from "../controllers/expensesController";
+import { Router } from 'express'
+import expensesController from '../controllers/expensesController'
 
-const expensesRouter = Router();
+const expensesRouter = Router()
 
 /**
  * @swagger
@@ -19,10 +19,10 @@ const expensesRouter = Router();
  *               items:
  *                 $ref: '#/components/PrismaClient'
  */
-expensesRouter.get("/", expensesController.getAllExpenses);
-expensesRouter.get("/:id", expensesController.getExpenseById); 
-expensesRouter.post("/", expensesController.createExpense);     
-expensesRouter.put("/:id", expensesController.updateExpenseById)
-expensesRouter.delete("/:id", expensesController.deleteExpenseById)
+expensesRouter.get('/', expensesController.getAllExpenses)
+expensesRouter.get('/:id', expensesController.getExpenseById)
+expensesRouter.post('/', expensesController.createExpense)
+expensesRouter.put('/:id', expensesController.updateExpenseById)
+expensesRouter.delete('/:id', expensesController.deleteExpenseById)
 
-export default expensesRouter;
+export default expensesRouter

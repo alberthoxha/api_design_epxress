@@ -1,17 +1,17 @@
-import { NextFunction, Response } from "express";
-import { validationResult } from "express-validator";
+import { NextFunction, Response } from 'express'
+import { validationResult } from 'express-validator'
 
 export const handleInputErrors = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void => {
-  const errors = validationResult(req);
+  const errors = validationResult(req)
 
   if (!errors.isEmpty()) {
-    res.status(400);
-    res.json({ errors: errors.array() });
+    res.status(400)
+    res.json({ errors: errors.array() })
   } else {
-    next();
+    next()
   }
-};
+}

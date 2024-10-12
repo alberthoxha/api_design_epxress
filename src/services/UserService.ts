@@ -1,14 +1,14 @@
-import { PrismaClient } from "@prisma/client";
-import { z } from "zod";
-import { CreateUserSchema, LoginUserSchema } from "../zodSchema";
+import { PrismaClient } from '@prisma/client'
+import { z } from 'zod'
+import { CreateUserSchema, LoginUserSchema } from '../zodSchema'
 import {
   comparePasswords,
   createJWT,
   hashPassword,
-} from "./../middlewares/auth";
+} from './../middlewares/auth'
 
 class UserService {
-  private prisma = new PrismaClient();
+  private prisma = new PrismaClient()
 
   async createNewUser(userData: z.infer<typeof CreateUserSchema>) {
     const user = await this.prisma.user.create({
@@ -17,9 +17,9 @@ class UserService {
         email: userData.email,
         password: await hashPassword(userData.password),
       },
-    });
+    })
 
-    const token = createJWT(user);
+    const token = createJWT(user)
     return {
       token,
       user: {
@@ -27,7 +27,7 @@ class UserService {
         email: user.email,
         name: user.name,
       },
-    };
+    }
   }
 
   async login(userData: z.infer<typeof LoginUserSchema>) {
@@ -35,20 +35,20 @@ class UserService {
       where: {
         email: userData.email,
       },
-    });
+    })
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found')
     }
 
-    const isValid = await comparePasswords(userData.password, user.password);
+    const isValid = await comparePasswords(userData.password, user.password)
     if (!isValid) {
-      throw new Error("Invalid password");
+      throw new Error('Invalid password')
     }
 
-    const token = createJWT(user);
-    return { token };
+    const token = createJWT(user)
+    return { token }
   }
 }
 
-export default new UserService();
+export default new UserService()
