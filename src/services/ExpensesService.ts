@@ -2,21 +2,21 @@ import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 import { CreateExpanseSchema } from '../zodSchema'
 import { UpdateExpanseSchema } from './../zodSchema'
+import { UserRequest } from '../_types/types'
 
 class ExpensesService {
   private prisma = new PrismaClient()
 
-  async getAllExpenses(data: any) {
+  async getAllExpenses(req: UserRequest) {
     try {
-      const { user } = data
-
+      if (!req.user) throw new Error('user not fuund')
       const expenses = await this.prisma.expense.findMany({
-        where: { userId: user.id },
+        where: { userId: req.user.id },
         include: { category: true },
       })
 
       const total = await this.prisma.expense.count({
-        where: { userId: user.id },
+        where: { userId: req.user.id },
       })
 
       const formattedExpenses = expenses.map((expense) => ({
@@ -32,13 +32,14 @@ class ExpensesService {
     }
   }
 
-  async getExpenseById(id: string, req: any) {
+  async getExpenseById(id: string, req: UserRequest) {
     try {
       const foundExpense = await this.prisma.expense.findUnique({
         where: { id },
         include: { category: true },
       })
 
+      if (!req.user) throw new Error('user not fuund')
       if (!foundExpense || foundExpense.userId !== req.user.id) throw new Error('Expense not found')
 
       const formattedExpense = {
@@ -54,8 +55,10 @@ class ExpensesService {
     }
   }
 
-  async createExpense(expenseData: z.infer<typeof CreateExpanseSchema>, req: any) {
+  async createExpense(expenseData: z.infer<typeof CreateExpanseSchema>, req: UserRequest) {
     const { amount, description, category, paymentMethod } = expenseData
+
+    if (!req.user) throw new Error('user not fuund')
     const userId = req.user.id
 
     const categoryId = category
@@ -81,10 +84,11 @@ class ExpensesService {
 
   async updateExpenseById(
     expenseId: string,
-    req: any,
+    req: UserRequest,
     updateValue: z.infer<typeof UpdateExpanseSchema>
   ) {
     const { amount, category, description, paymentMethod } = updateValue
+    if (!req.user) throw new Error('user not fuund')
     const userId = req.user.id
 
     const existingExpense = await this.prisma.expense.findUnique({
@@ -111,13 +115,14 @@ class ExpensesService {
     })
   }
 
-  async deleteExpenseById(expenseId: string, req: any) {
+  async deleteExpenseById(expenseId: string, req: UserRequest) {
     const expenseToDelete = await this.prisma.expense.findUnique({
       where: {
         id: expenseId,
       },
     })
 
+    if (!req.user) throw new Error('user not fuund')
     if (!expenseToDelete || expenseToDelete.userId !== req.user.id)
       throw new Error('Expense not found')
 

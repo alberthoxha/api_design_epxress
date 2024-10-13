@@ -1,9 +1,10 @@
 import { Request, Response } from 'express'
 import expensesService from '../services/ExpensesService'
 import { CreateExpanseSchema, UpdateExpanseSchema } from '../zodSchema'
+import { UserRequest } from '../_types/types'
 
 class ExpensesController {
-  async getAllExpenses(req: Request, res: Response) {
+  async getAllExpenses(req: UserRequest, res: Response) {
     try {
       const { expenses, total } = await expensesService.getAllExpenses(req)
       res.json({ data: expenses, total })
