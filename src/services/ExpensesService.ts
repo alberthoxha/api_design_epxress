@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
+import { UserRequest } from '../_types/types'
 import { CreateExpanseSchema } from '../zodSchema'
 import { UpdateExpanseSchema } from './../zodSchema'
-import { UserRequest } from '../_types/types'
 
 class ExpensesService {
   private prisma = new PrismaClient()
