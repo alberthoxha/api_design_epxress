@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
+import HttpException from '../errors/HttpException.ts '
 import { CreateUserSchema, LoginUserSchema } from '../zodSchema'
 import { comparePasswords, createJWT, hashPassword } from './../middlewares/auth'
 
@@ -33,14 +34,10 @@ class UserService {
       },
     })
 
-    if (!user) {
-      throw new Error('User not found')
-    }
+    if (!user) throw new HttpException(404, 'User not found!')
 
     const isValid = await comparePasswords(userData.password, user.password)
-    if (!isValid) {
-      throw new Error('Invalid password')
-    }
+    if (!isValid) throw new HttpException(404, 'User not found!')
 
     const token = createJWT(user)
     return { token }

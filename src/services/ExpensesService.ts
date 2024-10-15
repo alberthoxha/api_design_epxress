@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 import { UserRequest } from '../_types/types'
+import HttpException from '../errors/HttpException.ts '
 import { CreateExpanseSchema } from '../zodSchema'
 import { UpdateExpanseSchema } from './../zodSchema'
 
@@ -9,7 +10,7 @@ class ExpensesService {
 
   async getAllExpenses(req: UserRequest) {
     try {
-      if (!req.user) throw new Error('user not fuund')
+      if (!req.user) throw new HttpException(404, 'User not found!')
       const expenses = await this.prisma.expense.findMany({
         where: { userId: req.user.id },
         include: { category: true },
@@ -39,8 +40,9 @@ class ExpensesService {
         include: { category: true },
       })
 
-      if (!req.user) throw new Error('user not fuund')
-      if (!foundExpense || foundExpense.userId !== req.user.id) throw new Error('Expense not found')
+      if (!req.user) throw new HttpException(404, 'User not found!')
+      if (!foundExpense || foundExpense.userId !== req.user.id!)
+        throw new HttpException(403, 'You do not have permission to access this expense')
 
       const formattedExpense = {
         ...foundExpense,
@@ -58,7 +60,7 @@ class ExpensesService {
   async createExpense(expenseData: z.infer<typeof CreateExpanseSchema>, req: UserRequest) {
     const { amount, description, category, paymentMethod } = expenseData
 
-    if (!req.user) throw new Error('user not fuund')
+    if (!req.user) throw new HttpException(404, 'User not found')
     const userId = req.user.id
 
     const categoryId = category
@@ -88,8 +90,7 @@ class ExpensesService {
     updateValue: z.infer<typeof UpdateExpanseSchema>
   ) {
     const { amount, category, description, paymentMethod } = updateValue
-    if (!req.user) throw new Error('user not fuund')
-    const userId = req.user.id
+    if (!req.user) throw new HttpException(404, 'User not found!')
 
     const existingExpense = await this.prisma.expense.findUnique({
       where: {
@@ -97,7 +98,8 @@ class ExpensesService {
       },
     })
 
-    if (!existingExpense || existingExpense.userId !== userId) throw new Error('Expense not found')
+    if (!existingExpense || existingExpense.userId !== req.user.id)
+      throw new HttpException(403, 'You do not have permission to access this expense')
 
     const categoryId = category
       ? (
@@ -122,9 +124,10 @@ class ExpensesService {
       },
     })
 
-    if (!req.user) throw new Error('user not fuund')
+    if (!req.user) throw new HttpException(404, 'User not found!')
+
     if (!expenseToDelete || expenseToDelete.userId !== req.user.id)
-      throw new Error('Expense not found')
+      throw new HttpException(403, 'You do not have permission to access this expense')
 
     await this.prisma.expense.delete({
       where: {

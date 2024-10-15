@@ -1,7 +1,8 @@
 import { Request, Response } from 'express'
-import expensesService from '../services/ExpensesService'
-import { CreateExpanseSchema, UpdateExpanseSchema } from '../zodSchema'
 import { UserRequest } from '../_types/types'
+import expensesService from '../services/ExpensesService'
+import { handleError } from '../utils/errorHandler'
+import { CreateExpanseSchema, UpdateExpanseSchema } from '../zodSchema'
 
 class ExpensesController {
   async getAllExpenses(req: UserRequest, res: Response) {
@@ -20,8 +21,7 @@ class ExpensesController {
       const foundExpense = await expensesService.getExpenseById(id, req)
       res.status(200).json(foundExpense)
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'An unexpected error occurred'
-      res.status(500).send({ message })
+      handleError(error, res)
     }
   }
 
@@ -33,8 +33,8 @@ class ExpensesController {
     try {
       const newExpense = await expensesService.createExpense(isValidated.data!, req)
       res.status(201).json(newExpense)
-    } catch (error: any) {
-      res.status(500).send({ message: error?.message })
+    } catch (error: unknown) {
+      handleError(error, res)
     }
   }
 

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import userService from '../services/UserService'
 import { CreateUserSchema, LoginUserSchema } from '../zodSchema'
+import { handleError } from '../utils/errorHandler'
 
 class UserController {
   async createNewUser(req: Request, res: Response) {
@@ -11,8 +12,8 @@ class UserController {
     try {
       const { token } = await userService.createNewUser(newUser.data!)
       res.json({ token })
-    } catch (error: any) {
-      res.status(500).json({ error: error?.message })
+    } catch (error: unknown) {
+      handleError(error, res)
     }
   }
 
@@ -24,17 +25,17 @@ class UserController {
     try {
       const { token } = await userService.login(req.body)
       res.json({ token })
-    } catch (error: any) {
-      res.status(500).json({ error: error?.message })
+    } catch (error: unknown) {
+      handleError(error, res)
     }
   }
 
-  async logout(req: Request, res: Response) {
+  async logout(_: Request, res: Response) {
     try {
       res.clearCookie('cookies')
       res.status(200).json({ message: 'Logged out successfully' })
-    } catch (error: any) {
-      res.status(500).json({ message: error?.message })
+    } catch (error: unknown) {
+      handleError(error, res)
     }
   }
 }
