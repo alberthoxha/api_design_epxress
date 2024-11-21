@@ -5,6 +5,10 @@ import { authenticate } from '../middlewares/auth'
 
 const api = Router()
 
+api.get('/', (req, res) => {
+  res.json({ message: 'Hello world' })
+})
+
 api.post('/user/signup', userController.createNewUser)
 api.post('/user/login', userController.login)
 api.post('/user/logout', userController.logout)
