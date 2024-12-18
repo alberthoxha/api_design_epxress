@@ -7,7 +7,18 @@ import { swaggerSpec } from './swagger/swagger'
 
 const app = express()
 
-app.use(cors())
+// Metro waiting on exp://192.168.100.83:8081
+// › Scan the QR code above with Expo Go (Android) or the Camera app (iOS)
+
+// › Web is waiting on http://localhost:8081
+
+app.use(
+  cors({
+    origin: ['*', 'http://192.168.100.83:8081', 'http://localhost:8081'], // Replace with your frontend's URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true, // If using cookies or authentication headers
+  })
+)
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
