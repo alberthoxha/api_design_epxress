@@ -19,6 +19,7 @@ app.use(
     credentials: true, // If using cookies or authentication headers
   })
 )
+
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))

@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { comparePasswords, createJWT, hashPassword } from '../middlewares/auth'
 import prisma from '../prisma/client'
 import { CreateUserSchema, LoginUserSchema } from '../zodSchema'
-import { Token, UserRequestWithToken } from '../_types/types'
+import { UserRequestWithToken } from '../_types/types'
 import { createHttpException } from '../errors/HttpException'
 
 async function createNewUser(
@@ -27,7 +27,7 @@ async function createNewUser(
   }
 }
 
-async function login(userData: z.infer<typeof LoginUserSchema>): Promise<Token> {
+async function login(userData: z.infer<typeof LoginUserSchema>): Promise<UserRequestWithToken> {
   const user = await prisma.user.findUnique({
     where: {
       email: userData.email,
@@ -40,7 +40,7 @@ async function login(userData: z.infer<typeof LoginUserSchema>): Promise<Token> 
   if (!isValid) throw createHttpException(404, 'User not found!')
 
   const token = createJWT(user)
-  return { token }
+  return { token, user }
 }
 
 export default {

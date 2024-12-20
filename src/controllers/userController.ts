@@ -9,8 +9,8 @@ async function createNewUser(req: Request, res: Response): Promise<void> {
   if (!newUser.success) res.status(400).json(newUser.error)
 
   try {
-    const { token } = await userService.createNewUser(newUser.data!)
-    res.json({ token })
+    const { token, user } = await userService.createNewUser(newUser.data!)
+    res.json({ token, user })
   } catch (error: unknown) {
     handleError(error, res)
   }
@@ -22,8 +22,8 @@ async function login(req: Request, res: Response): Promise<void> {
   if (!loginUser.success) res.status(400).json(loginUser.error)
 
   try {
-    const { token } = await userService.login(req.body)
-    res.json({ token })
+    const { token, user } = await userService.login(req.body)
+    res.json({ token, user })
   } catch (error: unknown) {
     handleError(error, res)
   }
