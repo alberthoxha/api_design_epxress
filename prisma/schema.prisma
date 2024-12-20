@@ -20,6 +20,7 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   expenses  Expense[]
+  notes     Note[]    // New relation to Note model
 }
 
 model Expense {
@@ -40,4 +41,14 @@ model Category {
   id       String    @id @default(uuid())
   name     String    @unique
   expenses Expense[]
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  title     String   
+  content   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 }
