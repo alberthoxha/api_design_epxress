@@ -14,9 +14,9 @@ const app = express()
 
 app.use(
   cors({
-    origin: ['http://192.168.100.83:8081', 'http://localhost:8081'], // Allowed origins
+    origin: ['*', 'http://192.168.100.83:8081', 'http://localhost:8081'], // Replace with your frontend's URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true, // Necessary if using cookies/auth headers
+    credentials: true, // If using cookies or authentication headers
   })
 )
 app.use(morgan('dev'))

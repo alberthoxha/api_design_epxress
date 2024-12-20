@@ -22,7 +22,7 @@ const getLocalIPAddress = (): string | null => {
   return null
 }
 
-const PORT = 3000
+const PORT = 3001
 const HOST = '0.0.0.0'
 const localIP = getLocalIPAddress()
 
