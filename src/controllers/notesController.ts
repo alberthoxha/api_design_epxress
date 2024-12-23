@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { UserRequest } from '../_types/types'
 import notesServices from '../services/notesServices'
+import { CreateNoteSchema, UpdateNoteSchema } from '../zodSchema'
 
 async function list(req: Request, res: Response): Promise<void> {
   try {
@@ -14,8 +14,7 @@ async function list(req: Request, res: Response): Promise<void> {
 
 async function show(req: Request, res: Response): Promise<void> {
   try {
-    const { id } = req.params
-    const note = await notesServices.fetchById(id, req)
+    const note = await notesServices.fetchById(req)
     res.status(200).json(note)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'An unexpected error occurred'
@@ -24,6 +23,9 @@ async function show(req: Request, res: Response): Promise<void> {
 }
 
 async function create(req: Request, res: Response): Promise<void> {
+  const isValidated = CreateNoteSchema.strict().safeParse(req.body)
+  if (!isValidated.success) res.status(400).json(isValidated.error)
+
   try {
     const newNote = await notesServices.addNew(req)
     res.status(201).json(newNote)
@@ -34,9 +36,11 @@ async function create(req: Request, res: Response): Promise<void> {
 }
 
 async function edit(req: Request, res: Response): Promise<void> {
+  const isValidated = UpdateNoteSchema.strict().safeParse(req.body)
+  if (!isValidated.success) res.status(400).json(isValidated.error)
+
   try {
-    const { id } = req.params
-    const updatedNote = await notesServices.updateById(id, req)
+    const updatedNote = await notesServices.updateById(req)
     res.status(200).json(updatedNote)
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'An unexpected error occurred'
@@ -46,8 +50,7 @@ async function edit(req: Request, res: Response): Promise<void> {
 
 async function destroy(req: Request, res: Response): Promise<void> {
   try {
-    const { id } = req.params
-    await notesServices.deleteById(id, req)
+    await notesServices.deleteById(req)
     res.status(204).send()
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'An unexpected error occurred'

@@ -1,16 +1,16 @@
 import { Request, Response } from 'express'
-import { CreateUserSchema, LoginUserSchema } from '../zodSchema'
-import { handleError } from '../utils/errorHandler'
 import userService from '../services/userService'
+import { handleError } from '../utils/errorHandler'
+import { CreateUserSchema, LoginUserSchema } from '../zodSchema'
 
 async function createNewUser(req: Request, res: Response): Promise<void> {
   const newUser = CreateUserSchema.strict().safeParse(req.body)
-
   if (!newUser.success) res.status(400).json(newUser.error)
 
   try {
-    const { token, user } = await userService.createNewUser(newUser.data!)
-    res.json({ token, user })
+    const { token, user } = await userService.createNewUser(req)
+    const { password, ...newUser } = user
+    res.json({ token, user: newUser })
   } catch (error: unknown) {
     handleError(error, res)
   }
@@ -19,11 +19,15 @@ async function createNewUser(req: Request, res: Response): Promise<void> {
 async function login(req: Request, res: Response): Promise<void> {
   const loginUser = LoginUserSchema.strict().safeParse(req.body)
 
-  if (!loginUser.success) res.status(400).json(loginUser.error)
+  if (!loginUser.success) {
+    res.status(400).json(loginUser.error)
+    return
+  }
 
   try {
-    const { token, user } = await userService.login(req.body)
-    res.json({ token, user })
+    const { token, user } = await userService.login(req)
+    const { password, ...loginResponse } = user
+    res.json({ token, user: loginResponse })
   } catch (error: unknown) {
     handleError(error, res)
   }

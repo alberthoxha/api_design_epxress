@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import { PaymentType } from '@prisma/client'
+import * as z from 'zod'
 
 export const CreateUserSchema = z.object({
   email: z.string().email({ message: 'Invalid email address.' }),
@@ -16,7 +16,7 @@ export const LoginUserSchema = z.object({
 })
 
 export const CreateExpanseSchema = z.object({
-  amount: z.number().multipleOf(0.01),
+  amount: z.number().multipleOf(0.01).min(1),
   description: z.string(),
   category: z.string(),
   paymentMethod: z.nativeEnum(PaymentType),
@@ -24,7 +24,17 @@ export const CreateExpanseSchema = z.object({
 
 export const UpdateExpanseSchema = z.object({
   amount: z.number().multipleOf(0.01).min(1),
-  description: z.string().min(1),
-  category: z.string().min(1),
+  description: z.string(),
+  category: z.string(),
   paymentMethod: z.nativeEnum(PaymentType),
+})
+
+export const CreateNoteSchema = z.object({
+  title: z.string().min(1),
+  content: z.string().min(1),
+})
+
+export const UpdateNoteSchema = z.object({
+  title: z.string().min(1),
+  content: z.string().min(1),
 })

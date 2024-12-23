@@ -1,4 +1,4 @@
-import { UserRequest } from '../_types/types'
+import { CreateNoteDTO, UpdateNoteDTO, UserRequest } from '../_types/types'
 import { createHttpException } from '../errors/HttpException'
 import prisma from '../prisma/client'
 
@@ -19,10 +19,12 @@ async function fetchAll(req: UserRequest): Promise<any> {
   }
 }
 
-async function fetchById(id: string, req: UserRequest): Promise<any> {
+async function fetchById(req: UserRequest): Promise<any> {
   try {
+    const { id: NoteId } = req.params
+
     const note = await prisma.note.findUnique({
-      where: { id },
+      where: { id: NoteId },
     })
 
     if (!req.user) throw createHttpException(404, 'User not found!')
@@ -37,8 +39,7 @@ async function fetchById(id: string, req: UserRequest): Promise<any> {
 
 async function addNew(req: UserRequest): Promise<any> {
   try {
-    const { title, content } = req.body
-    console.log(title, content)
+    const { title, content } = req.body as CreateNoteDTO
     if (!req.user) throw createHttpException(404, 'User not found')
 
     const newNote = await prisma.note.create({
@@ -55,9 +56,10 @@ async function addNew(req: UserRequest): Promise<any> {
   }
 }
 
-async function updateById(id: string, req: UserRequest): Promise<any> {
+async function updateById(req: UserRequest): Promise<any> {
   try {
-    const { title, content } = req.body
+    const { title, content } = req.body as UpdateNoteDTO
+    const { id } = req.params
     if (!req.user) throw createHttpException(404, 'User not found')
 
     const updatedNote = await prisma.note.update({
@@ -74,9 +76,10 @@ async function updateById(id: string, req: UserRequest): Promise<any> {
   }
 }
 
-async function deleteById(id: string, req: UserRequest): Promise<any> {
+async function deleteById(req: UserRequest): Promise<any> {
   try {
     if (!req.user) throw createHttpException(404, 'User not found')
+    const { id } = req.params
 
     const note = await prisma.note.findUnique({
       where: { id },

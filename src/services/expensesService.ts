@@ -1,63 +1,54 @@
-import { z } from 'zod'
 import { UserRequest } from '../_types/types'
-import prisma from '../prisma/client'
-import { CreateExpanseSchema, UpdateExpanseSchema } from '../zodSchema'
 import { createHttpException } from '../errors/HttpException'
+import prisma from '../prisma/client'
+import { CreateExpenseDTO, UpdateExpenseDTO } from './../_types/types.d'
 
 async function fetchAll(req: UserRequest): Promise<any> {
-  try {
-    if (!req.user) throw createHttpException(404, 'User not found!')
-    const expenses = await prisma.expense.findMany({
-      where: { userId: req.user.id },
-      include: { category: true },
-    })
+  if (!req.user) throw createHttpException(404, 'User not found!')
+  const expenses = await prisma.expense.findMany({
+    where: { userId: req.user.id },
+    include: { category: true },
+  })
 
-    const total = await prisma.expense.count({
-      where: { userId: req.user.id },
-    })
+  const total = await prisma.expense.count({
+    where: { userId: req.user.id },
+  })
 
-    const formattedExpenses = expenses.map((expense) => ({
-      ...expense,
-      category: expense.category?.name,
-      paymentMethod: expense.paymentMethod,
-    }))
+  const formattedExpenses = expenses.map((expense) => ({
+    ...expense,
+    category: expense.category?.name,
+    paymentMethod: expense.paymentMethod,
+  }))
 
-    return { expenses: formattedExpenses, total }
-  } catch (error) {
-    throw error
-  }
-}
-async function fetchById(id: string, req: UserRequest): Promise<any> {
-  try {
-    const foundExpense = await prisma.expense.findUnique({
-      where: { id },
-      include: { category: true },
-    })
-
-    if (!req.user) throw createHttpException(404, 'User not found!')
-    if (!foundExpense || foundExpense.userId !== req.user.id!)
-      throw createHttpException(403, 'You do not have permission to access this expense')
-
-    const formattedExpense = {
-      ...foundExpense,
-      category: foundExpense?.category?.name,
-      paymentMethod: foundExpense?.paymentMethod,
-    }
-
-    return formattedExpense
-  } catch (error) {
-    throw error
-  }
+  return { expenses: formattedExpenses, total }
 }
 
-async function addNew(
-  expenseData: z.infer<typeof CreateExpanseSchema>,
-  req: UserRequest
-): Promise<any> {
-  const { amount, description, category, paymentMethod } = expenseData
+async function fetchById(req: UserRequest): Promise<any> {
+  const { id } = req.params
+
+  const foundExpense = await prisma.expense.findUnique({
+    where: { id },
+    include: { category: true },
+  })
+
+  if (!req.user) throw createHttpException(404, 'User not found!')
+  if (!foundExpense || foundExpense.userId !== req.user.id!)
+    throw createHttpException(403, 'You do not have permission to access this expense')
+
+  const formattedExpense = {
+    ...foundExpense,
+    category: foundExpense?.category?.name,
+    paymentMethod: foundExpense?.paymentMethod,
+  }
+
+  return formattedExpense
+}
+
+async function addNew(req: UserRequest): Promise<any> {
+  const { amount, description, category, paymentMethod } = req.body as CreateExpenseDTO
 
   if (!req.user) throw createHttpException(404, 'User not found')
-  const userId = req.user.id
+  const { id: userId } = req.user
 
   const categoryId = category
     ? (
@@ -79,12 +70,11 @@ async function addNew(
     },
   })
 }
-async function updateById(
-  expenseId: string,
-  req: UserRequest,
-  updateValue: z.infer<typeof UpdateExpanseSchema>
-): Promise<any> {
-  const { amount, category, description, paymentMethod } = updateValue
+
+async function updateById(req: UserRequest): Promise<any> {
+  const { amount, category, description, paymentMethod } = req.body as UpdateExpenseDTO
+  const { id: expenseId } = req.params
+
   if (!req.user) throw createHttpException(404, 'User not found!')
 
   const existingExpense = await prisma.expense.findUnique({
@@ -112,7 +102,9 @@ async function updateById(
   })
 }
 
-async function deleteById(expenseId: string, req: UserRequest): Promise<void> {
+async function deleteById(req: UserRequest): Promise<void> {
+  const { id: expenseId } = req.params
+
   const expenseToDelete = await prisma.expense.findUnique({
     where: {
       id: expenseId,

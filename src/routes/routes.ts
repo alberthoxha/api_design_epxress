@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express'
 import expensesController from '../controllers/expensesController'
 import userController from '../controllers/userController'
-import noteController from '../controllers/notesController'
+import notesController from '../controllers/notesController'
 import { authenticate } from '../middlewares/auth'
 
 const api = Router()
@@ -20,10 +20,10 @@ api.post('/expenses', authenticate, expensesController.create)
 api.put('/expenses/:id', authenticate, expensesController.edit)
 api.delete('/expenses/:id', authenticate, expensesController.destroy)
 
-api.get('/notes', authenticate, noteController.list)
-api.get('/notes/:id', authenticate, noteController.show)
-api.post('/notes', authenticate, noteController.create)
-api.put('/notes/:id', authenticate, noteController.edit)
-api.delete('/notes/:id', authenticate, noteController.destroy)
+api.get('/notes', authenticate, notesController.list)
+api.get('/notes/:id', authenticate, notesController.show)
+api.post('/notes', authenticate, notesController.create)
+api.put('/notes/:id', authenticate, notesController.edit)
+api.delete('/notes/:id', authenticate, notesController.destroy)
 
 export default Router().use('/api', api)

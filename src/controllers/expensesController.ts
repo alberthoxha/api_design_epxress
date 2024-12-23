@@ -16,8 +16,7 @@ async function list(req: UserRequest, res: Response): Promise<void> {
 
 async function show(req: Request, res: Response): Promise<void> {
   try {
-    const { id } = req.params
-    const foundExpense = await expensesService.fetchById(id, req)
+    const foundExpense = await expensesService.fetchById(req)
     res.status(200).json(foundExpense)
   } catch (error: unknown) {
     handleError(error, res)
@@ -26,11 +25,10 @@ async function show(req: Request, res: Response): Promise<void> {
 
 async function create(req: Request, res: Response): Promise<void> {
   const isValidated = CreateExpanseSchema.strict().safeParse(req.body)
-
   if (!isValidated.success) res.status(400).json(isValidated.error)
 
   try {
-    const newExpense = await expensesService.addNew(isValidated.data!, req)
+    const newExpense = await expensesService.addNew(req)
     res.status(201).json(newExpense)
   } catch (error: unknown) {
     handleError(error, res)
@@ -38,14 +36,11 @@ async function create(req: Request, res: Response): Promise<void> {
 }
 
 async function edit(req: Request, res: Response): Promise<void> {
-  const { id } = req.params
   const isValidated = UpdateExpanseSchema.strict().safeParse(req.body)
-
   if (!isValidated.success) res.status(400).json(isValidated.error)
-  const { data } = isValidated
 
   try {
-    await expensesService.updateById(id, req, data!)
+    await expensesService.updateById(req)
     res.status(204).send()
   } catch (error: any) {
     res.status(500).send({ message: error?.message })
@@ -53,9 +48,8 @@ async function edit(req: Request, res: Response): Promise<void> {
 }
 
 async function destroy(req: Request, res: Response): Promise<void> {
-  const { id } = req.params
   try {
-    await expensesService.deleteById(id, req)
+    await expensesService.deleteById(req)
     res.status(204).send()
   } catch (error: any) {
     res.status(500).send({ message: error?.message })
