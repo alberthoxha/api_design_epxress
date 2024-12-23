@@ -4,9 +4,9 @@ import { handleError } from '../utils/errorHandler'
 import { CreateExpanseSchema, UpdateExpanseSchema } from '../zodSchema'
 import expensesService from '../services/expensesService'
 
-async function getAllExpenses(req: UserRequest, res: Response): Promise<void> {
+async function list(req: UserRequest, res: Response): Promise<void> {
   try {
-    const { expenses, total } = await expensesService.getAllExpenses(req)
+    const { expenses, total } = await expensesService.fetchAll(req)
     res.json({ data: expenses, total })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'An unexpected error occurred'
@@ -14,30 +14,30 @@ async function getAllExpenses(req: UserRequest, res: Response): Promise<void> {
   }
 }
 
-async function getExpenseById(req: Request, res: Response): Promise<void> {
+async function show(req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params
-    const foundExpense = await expensesService.getExpenseById(id, req)
+    const foundExpense = await expensesService.fetchById(id, req)
     res.status(200).json(foundExpense)
   } catch (error: unknown) {
     handleError(error, res)
   }
 }
 
-async function createExpense(req: Request, res: Response): Promise<void> {
+async function create(req: Request, res: Response): Promise<void> {
   const isValidated = CreateExpanseSchema.strict().safeParse(req.body)
 
   if (!isValidated.success) res.status(400).json(isValidated.error)
 
   try {
-    const newExpense = await expensesService.createExpense(isValidated.data!, req)
+    const newExpense = await expensesService.addNew(isValidated.data!, req)
     res.status(201).json(newExpense)
   } catch (error: unknown) {
     handleError(error, res)
   }
 }
 
-async function updateExpenseById(req: Request, res: Response): Promise<void> {
+async function edit(req: Request, res: Response): Promise<void> {
   const { id } = req.params
   const isValidated = UpdateExpanseSchema.strict().safeParse(req.body)
 
@@ -45,17 +45,17 @@ async function updateExpenseById(req: Request, res: Response): Promise<void> {
   const { data } = isValidated
 
   try {
-    await expensesService.updateExpenseById(id, req, data!)
+    await expensesService.updateById(id, req, data!)
     res.status(204).send()
   } catch (error: any) {
     res.status(500).send({ message: error?.message })
   }
 }
 
-async function deleteExpenseById(req: Request, res: Response): Promise<void> {
+async function destroy(req: Request, res: Response): Promise<void> {
   const { id } = req.params
   try {
-    await expensesService.deleteExpenseById(id, req)
+    await expensesService.deleteById(id, req)
     res.status(204).send()
   } catch (error: any) {
     res.status(500).send({ message: error?.message })
@@ -63,9 +63,9 @@ async function deleteExpenseById(req: Request, res: Response): Promise<void> {
 }
 
 export default {
-  getAllExpenses,
-  getExpenseById,
-  createExpense,
-  updateExpenseById,
-  deleteExpenseById,
+  list,
+  show,
+  create,
+  edit,
+  destroy,
 }

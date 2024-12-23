@@ -4,7 +4,7 @@ import prisma from '../prisma/client'
 import { CreateExpanseSchema, UpdateExpanseSchema } from '../zodSchema'
 import { createHttpException } from '../errors/HttpException'
 
-async function getAllExpenses(req: UserRequest): Promise<any> {
+async function fetchAll(req: UserRequest): Promise<any> {
   try {
     if (!req.user) throw createHttpException(404, 'User not found!')
     const expenses = await prisma.expense.findMany({
@@ -27,8 +27,7 @@ async function getAllExpenses(req: UserRequest): Promise<any> {
     throw error
   }
 }
-
-async function getExpenseById(id: string, req: UserRequest): Promise<any> {
+async function fetchById(id: string, req: UserRequest): Promise<any> {
   try {
     const foundExpense = await prisma.expense.findUnique({
       where: { id },
@@ -51,7 +50,7 @@ async function getExpenseById(id: string, req: UserRequest): Promise<any> {
   }
 }
 
-async function createExpense(
+async function addNew(
   expenseData: z.infer<typeof CreateExpanseSchema>,
   req: UserRequest
 ): Promise<any> {
@@ -80,8 +79,7 @@ async function createExpense(
     },
   })
 }
-
-async function updateExpenseById(
+async function updateById(
   expenseId: string,
   req: UserRequest,
   updateValue: z.infer<typeof UpdateExpanseSchema>
@@ -114,7 +112,7 @@ async function updateExpenseById(
   })
 }
 
-async function deleteExpenseById(expenseId: string, req: UserRequest): Promise<void> {
+async function deleteById(expenseId: string, req: UserRequest): Promise<void> {
   const expenseToDelete = await prisma.expense.findUnique({
     where: {
       id: expenseId,
@@ -134,9 +132,9 @@ async function deleteExpenseById(expenseId: string, req: UserRequest): Promise<v
 }
 
 export default {
-  getAllExpenses,
-  deleteExpenseById,
-  getExpenseById,
-  createExpense,
-  updateExpenseById,
+  fetchAll,
+  fetchById,
+  addNew,
+  updateById,
+  deleteById,
 }
