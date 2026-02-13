@@ -2,7 +2,7 @@ import cors from 'cors'
 import express, { Express } from 'express'
 import morgan from 'morgan'
 import swaggerUi from 'swagger-ui-express'
-import routes from './routes/routes'
+import { router } from './infrastructure/container'
 import { swaggerSpec } from './swagger/swagger'
 
 const app = express()
@@ -23,7 +23,7 @@ app.use(
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(routes)
+app.use(router)
 
 export const setupSwagger = (app: Express): void => {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))

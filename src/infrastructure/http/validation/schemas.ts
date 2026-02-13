@@ -1,5 +1,5 @@
-import { PaymentType } from '@prisma/client'
 import * as z from 'zod'
+import { PaymentType } from '../../../domain/entities/Expense'
 
 export const CreateUserSchema = z.object({
   email: z.string().email({ message: 'Invalid email address.' }),
